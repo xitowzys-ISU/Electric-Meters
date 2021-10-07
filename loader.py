@@ -10,8 +10,8 @@ from config import YANDEX_OBJECT_STORAGE_BUCKET
 from core import YandexToloka, YandexObjectStorage
 
 
-def parseData(submitted_tasks: list, YT_POOL_1: "YandexToloka", POOL_2_ID: "YandexToloka",
-              YOS: "YandexObjectStorage") -> tuple[
+def parse_data_first_pool(submitted_tasks: list, YT_POOL_1: "YandexToloka", POOL_2_ID: "YandexToloka",
+                          YOS: "YandexObjectStorage") -> tuple[
     dict, dict, list[dict[str, Union[Union[dict[str, Any], int], Any]]]]:
     """
     Парсинг данных полученных из 1 пула
@@ -58,9 +58,9 @@ def start() -> None:
         * Оборачиваем параметры в json для второго задания
     '''
     print(f"{colorama.Fore.YELLOW}Загрузка картинок в {colorama.Fore.RED}Yandex Object Storage:")
-    url_to_first_id_map, first_id_to_second_id_map, json_second_task = parseData(submitted_tasks, YT_POOL_1,
-                                                                                 YT_POOL_2.get_pool_id(), YOS)
-
+    url_to_first_id_map, first_id_to_second_id_map, json_second_task = parse_data_first_pool(submitted_tasks, YT_POOL_1,
+                                                                                             YT_POOL_2.get_pool_id(),
+                                                                                             YOS)
 
     print(url_to_first_id_map)
     print("------------------------------")

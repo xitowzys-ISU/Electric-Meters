@@ -3,11 +3,11 @@ import requests
 
 class YandexToloka:
     def __init__(self, pool_id: int, toloka_oauth_token: str) -> None:
-        self.__TOLOKA_OAUTH_TOKEN = toloka_oauth_token
-        self.__POOL_ID = pool_id
-        self.URL_API = "https://toloka.yandex.ru/api/v1/"
-        self.HEADERS = {
-            "Authorization": "OAuth %s" % toloka_oauth_token,
+        self.__TOLOKA_OAUTH_TOKEN: str = toloka_oauth_token
+        self.__pool_id: int = pool_id
+        self.__url_api: str = "https://toloka.yandex.ru/api/v1/"
+        self.__header = {
+            "Authorization": f"OAuth {toloka_oauth_token}",
             "Content-Type": "application/JSON",
         }
 
@@ -18,11 +18,21 @@ class YandexToloka:
         :return: json список
         """
 
-        url_assignments = (
-                self.URL_API + "assignments/?status=SUBMITTED&limit=10000&pool_id=%s" % self.__POOL_ID
-        )
+        url_assignments = f"{self.__url_api}assignments/?status=SUBMITTED&limit=10000&pool_id={self.__pool_id}"
 
-        return requests.get(url_assignments, headers=self.HEADERS).json()["items"]
+        return requests.get(url_assignments, headers=self.__header).json()["items"]
+
+    def get_header(self):
+        """
+        Получить header
+
+        :return: header
+        """
+        return self.__header
+
+    def set_pool__id(self, pool_id: int):
+        """ Задать новый pool ID """
+        self.__pool_id = pool_id
 
     def get_pool_id(self) -> int:
         """
@@ -30,6 +40,11 @@ class YandexToloka:
 
         :return: id пула
         """
-        return self.__POOL_ID
+        return self.__pool_id
 
+    def set_url_api(self, url_api: str) -> None:
+        """ Задать новый URL API """
+        self.__url_api = url_api
 
+    def get_url_api(self):
+        return self.__url_api
