@@ -1,0 +1,9 @@
+from environs import Env
+
+env = Env()
+env.read_env()
+
+TOLOKA_OAUTH_TOKEN = env.str("TOLOKA_OAUTH_TOKEN")
+AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY")
+AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID")
+YANDEX_OBJECT_STORAGE_BUCKET = env.str("YANDEX_OBJECT_STORAGE_BUCKET")
