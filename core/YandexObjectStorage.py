@@ -16,14 +16,14 @@ class YandexObjectStorage:
         self.__endpoint_url: str = "https://storage.yandexcloud.net"
 
     def load_image_on_yandex_storage(self, yt: "YandexToloka", img_id: str) -> str:
-        '''Cкачивает изображение из задания, загружает
+        """Cкачивает изображение из задания, загружает
         в Yandex Object Storage и возвращает ссылку на изображение
 
         :param yt: Объект класса YandexToloka
         :param img_id: id изображения
 
         :return: Ссылка на изображение
-        '''
+        """
         session = boto3.session.Session(
             aws_secret_access_key=self.__AWS_SECRET_ACCESS_KEY,
             aws_access_key_id=self.__AWS_ACCESS_KEY_ID
@@ -38,4 +38,4 @@ class YandexObjectStorage:
         except botocore.exceptions.ClientError as e:
             raise Exception("Ошибка подписки. Проверьте ключ, id и Bucket на подлинность.")
 
-        return f"https://storage.yandexcloud.net/schetchiki/{img_id}"
+        return f"https://storage.yandexcloud.net/{self.__YANDEX_OBJECT_STORAGE_BUCKET}/{img_id}"
