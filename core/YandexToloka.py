@@ -22,6 +22,14 @@ class YandexToloka:
 
         return requests.get(url_assignments, headers=self.__header).json()["items"]
 
+    def upload_task_pool(self, json: list):
+        """
+        Загрузить задания в пул
+
+        :return: json
+        """
+        return requests.post(url=self.__url_api + "tasks", headers=self.__header, json=json).json()
+
     def get_header(self):
         """
         Получить header
