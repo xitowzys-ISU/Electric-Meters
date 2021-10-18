@@ -22,6 +22,28 @@ class YandexToloka:
 
         return requests.get(url_assignments, headers=self.__header).json()["items"]
 
+    def get_all_accepted_tasks(self) -> str:
+        """
+        Получаем список всех заданий из пула, которые приняты
+
+        :return: json список
+        """
+
+        url_assignments = f"{self.__url_api}assignments/?status=ACCEPTED&pool_id={self.__pool_id}"
+
+        return requests.get(url_assignments, headers=self.__header).json()["items"]
+
+    def get_all_tasks(self) -> list:
+        """
+        Получаем список всех заданий
+
+        :return: json список
+        """
+
+        url_assignments = f"{self.__url_api}tasks/?pool_id={self.__pool_id}"
+
+        return requests.get(url_assignments, headers=self.__header).json()["items"]
+
     def upload_task_pool(self, json: list):
         """
         Загрузить задания в пул
@@ -56,3 +78,6 @@ class YandexToloka:
 
     def get_url_api(self):
         return self.__url_api
+
+    def get_image(self, img_id):
+        return requests.get(f"{self.__url_api}attachments/{img_id}/download", headers=self.__header)
