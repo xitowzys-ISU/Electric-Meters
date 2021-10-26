@@ -29,7 +29,7 @@ class YandexToloka:
         :return: json список
         """
 
-        url_assignments = f"{self.__url_api}assignments/?status=ACCEPTED&pool_id={self.__pool_id}"
+        url_assignments = f"{self.__url_api}assignments/?status=ACCEPTED&limit=10000&pool_id={self.__pool_id}"
 
         return requests.get(url_assignments, headers=self.__header).json()["items"]
 
