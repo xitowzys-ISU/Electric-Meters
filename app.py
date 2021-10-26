@@ -29,7 +29,6 @@ def start_process_first_pool() -> None:
 def start_process_second_pool() -> None:
     process_second_pool(
         path="./data/211026_190505_28984579_28992557_data.json",
-        yt_pool_1=YT_POOL_1,
         yt_pool_2=YT_POOL_2
     )
 
@@ -43,6 +42,6 @@ if __name__ == '__main__':
     menu.append_item(start_first_pool)
     menu.append_item(start_second_pool)
     menu.show()
-    # main()
+
     # start_process_first_pool()
     # start_process_second_pool()

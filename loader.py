@@ -62,9 +62,8 @@ def response_vector(k, second_task_id, second_task):
     """
     result = []
 
-    test2 = list(map(lambda t: np.where(np.array(list(map(lambda x: x['id'], t['tasks']))) == second_task_id), second_task))
-
-    print(second_task_id)
+    test2 = list(
+        map(lambda t: np.where(np.array(list(map(lambda x: x['id'], t['tasks']))) == second_task_id), second_task))
 
     for i in enumerate(test2):
         for j in i[1]:
@@ -136,6 +135,26 @@ def process_first_pool(yt_pool_1: "YandexToloka", yt_pool_2: "YandexToloka", oc:
     time.sleep(5)
 
 
+def verifying_responses(check_count, check_quality) -> dict:
+    if np.sum(check_count) < 3:
+        json_check = {
+            "status": "REJECTED",
+            "public_comment": "На фотографии должен быть ровно один счетчик холодной либо горячей воды",
+        }
+    elif np.sum(check_quality) < 3:
+        json_check = {
+            "status": "REJECTED",
+            "public_comment": "Показания на счетчике отчетливо не видны",
+        }
+    else:
+        json_check = {
+            "status": "ACCEPTED",
+            "public_comment": "Изображение счетчика принято",
+        }
+
+    return json_check
+
+
 def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
     db = []
 
@@ -145,7 +164,7 @@ def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
     tasks = yt_pool_2.get_all_tasks()
     second_tasks = yt_pool_2.get_all_accepted_tasks()
 
-    print("------------------------------------------")
+    # print("------------------------------------------")
 
     for first_task_id in tqdm(first_id_to_second_id_map):
         second_task_id = first_id_to_second_id_map[first_task_id]
@@ -156,29 +175,7 @@ def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
             check_count_list = response_vector("check_count", second_task_id, second_tasks)
             check_quality_list = response_vector("check_quality", second_task_id, second_tasks)
 
-            if np.sum(check_count_list) < 3:
-                print(second_task_id)
-                print("На фотографии должен быть ровно один счетчик")
-                json_check = {
-                    "status": "REJECTED",
-                    "public_comment": "На фотографии должен быть ровно один счетчик холодной либо горячей воды",
-                }
-                # Если больше двух людей сказали, что показания не видны, отклоняем задание
-            elif np.sum(check_quality_list) < 3:
-                print(second_task_id)
-                print("Показания на счетчике отчетливо не видны")
-                json_check = {
-                    "status": "REJECTED",
-                    "public_comment": "Показания на счетчике отчетливо не видны",
-                }
-                # В остальных случаях принимаем задание
-            else:
-                print(second_task_id)
-                print("Изображение счетчика принято")
-                json_check = {
-                    "status": "ACCEPTED",
-                    "public_comment": "Изображение счетчика принято",
-                }
+            json_check = verifying_responses(check_count_list, check_quality_list)
 
             # Найдем для принятых заданий самый частый ответ
             (values, counts) = np.unique(value_list, return_counts=True)
@@ -193,49 +190,27 @@ def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
                 ind = np.argmax(counts)
                 check_quality = values[ind]
 
-                print(
-                    "Показания счетчика: %s. Его подтвердили %d из 5 пользователей"
-                    % (value, counts[ind])
-                )
+                # print(
+                #     "Показания счетчика: %s. Его подтвердили %d из 5 пользователей"
+                #     % (value, counts[ind])
+                # )
 
-            print("------------------------------------------")
+            # print("------------------------------------------")
         else:
             value = parse_training_tasks("value", tasks, second_task_id)
             check_count = parse_training_tasks("check_count", tasks, second_task_id)
             check_quality = parse_training_tasks("check_quality", tasks, second_task_id)
 
-            if not check_count:
-                print(second_task_id)
-                print("На фотографии должен быть ровно один счетчик")
-                json_check = {
-                    "status": "REJECTED",
-                    "public_comment": "На фотографии должен быть ровно один счетчик холодной либо горячей воды",
-                }
-                # Если больше двух людей сказали, что показания не видны, отклоняем задание
-            elif not check_quality:
-                print(second_task_id)
-                print("Показания на счетчике отчетливо не видны")
-                json_check = {
-                    "status": "REJECTED",
-                    "public_comment": "Показания на счетчике отчетливо не видны",
-                }
-                # В остальных случаях принимаем задание
-            else:
-                print(second_task_id)
-                print("Изображение счетчика принято")
-                json_check = {
-                    "status": "ACCEPTED",
-                    "public_comment": "Изображение счетчика принято",
-                }
+            json_check = verifying_responses(check_count, check_quality)
 
             if json_check["status"] == "ACCEPTED":
                 value_list, check_count_list, check_quality_list = [], [], []
-                print(
-                    "Показания счетчика: %s. Тренировочное задание"
-                    % value
-                )
-
-            print("------------------------------------------")
+            #     print(
+            #         "Показания счетчика: %s. Тренировочное задание"
+            #         % value
+            #     )
+            #
+            # print("------------------------------------------")
 
         if json_check["status"] == "ACCEPTED":
             db.append(
