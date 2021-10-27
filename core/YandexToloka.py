@@ -52,6 +52,10 @@ class YandexToloka:
         """
         return requests.post(url=self.__url_api + "tasks", headers=self.__header, json=json).json()
 
+    def patch_task(self, task_id, json):
+        url = f"{self.__url_api}assignments/{task_id}"
+        return requests.patch(url, headers=self.__header, json=json)
+
     def get_header(self):
         """
         Получить header

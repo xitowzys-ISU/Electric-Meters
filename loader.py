@@ -21,12 +21,12 @@ def parse_data_first_pool(submitted_tasks: str, yt_pool_1: "YandexToloka",
         img_id = task["solutions"][0]["output_values"]["img"]
 
         image = yt_pool_1.get_image(img_id)
-        out = open(f"./tmp/{img_id}.jpg", 'wb')
+        out = open(f"./tmp/{first_task_id}.jpg", 'wb')
         out.write(image.content)
         out.close()
 
-        url_img = oc.push_file(f"{img_id}.jpg", f"./tmp/{img_id}.jpg")
-        os.remove(f"./tmp/{img_id}.jpg")
+        url_img = oc.push_file(f"{first_task_id}.jpg", f"./tmp/{first_task_id}.jpg")
+        os.remove(f"./tmp/{first_task_id}.jpg")
 
         url_to_first_id_map[url_img] = first_task_id
         json_second_task.append(
@@ -55,7 +55,7 @@ def parse_training_tasks(find: str, tasks: list, task_id: str):
             return k['known_solutions'][0]["output_values"][find]
 
 
-def response_vector(k, second_task_id, second_task):
+def response_vector(k, second_task_id, second_task) -> list:
     """По ключу возвращает вектор ответов id задания
 
     :return: list
@@ -71,6 +71,26 @@ def response_vector(k, second_task_id, second_task):
                 result.append(second_task[i[0]]['solutions'][j[0]]['output_values'][k])
 
     return result
+
+
+def verifying_responses(check_count, check_quality) -> dict:
+    if np.sum(check_count) < 3:
+        json_check = {
+            "status": "REJECTED",
+            "public_comment": "На фотографии должен быть ровно один электрический счетчик с показателями",
+        }
+    elif np.sum(check_quality) < 3:
+        json_check = {
+            "status": "REJECTED",
+            "public_comment": "Показания на счетчике отчетливо не видны",
+        }
+    else:
+        json_check = {
+            "status": "ACCEPTED",
+            "public_comment": "Изображение счетчика принято",
+        }
+
+    return json_check
 
 
 def process_first_pool(yt_pool_1: "YandexToloka", yt_pool_2: "YandexToloka", oc: "OwnCloudAPI") -> None:
@@ -135,26 +155,6 @@ def process_first_pool(yt_pool_1: "YandexToloka", yt_pool_2: "YandexToloka", oc:
     time.sleep(5)
 
 
-def verifying_responses(check_count, check_quality) -> dict:
-    if np.sum(check_count) < 3:
-        json_check = {
-            "status": "REJECTED",
-            "public_comment": "На фотографии должен быть ровно один счетчик холодной либо горячей воды",
-        }
-    elif np.sum(check_quality) < 3:
-        json_check = {
-            "status": "REJECTED",
-            "public_comment": "Показания на счетчике отчетливо не видны",
-        }
-    else:
-        json_check = {
-            "status": "ACCEPTED",
-            "public_comment": "Изображение счетчика принято",
-        }
-
-    return json_check
-
-
 def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
     db = []
 
@@ -164,8 +164,6 @@ def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
     tasks = yt_pool_2.get_all_tasks()
     second_tasks = yt_pool_2.get_all_accepted_tasks()
 
-    # print("------------------------------------------")
-
     for first_task_id in tqdm(first_id_to_second_id_map):
         second_task_id = first_id_to_second_id_map[first_task_id]
 
@@ -174,6 +172,7 @@ def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
             value_list = response_vector("value", second_task_id, second_tasks)
             check_count_list = response_vector("check_count", second_task_id, second_tasks)
             check_quality_list = response_vector("check_quality", second_task_id, second_tasks)
+            result = response_vector("result", second_task_id, second_tasks)
 
             json_check = verifying_responses(check_count_list, check_quality_list)
 
@@ -190,42 +189,55 @@ def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
                 ind = np.argmax(counts)
                 check_quality = values[ind]
 
-                # print(
-                #     "Показания счетчика: %s. Его подтвердили %d из 5 пользователей"
-                #     % (value, counts[ind])
-                # )
+                print(
+                    f"{colorama.Fore.GREEN}ID картинки -> [{first_task_id}] ({json_check['public_comment']}): {colorama.Fore.RESET}Показания счетчика: {value}. "
+                    f"Его подтвердили {counts[ind]} из 5 пользователей")
 
-            # print("------------------------------------------")
+            if json_check["status"] == "REJECTED":
+                print(
+                    f"{colorama.Fore.RED}ID картинки -> [{first_task_id}] ({json_check['public_comment']})")
+
+
         else:
+            print(f"{colorama.Fore.YELLOW}Тренировочное задание", end=" ")
             value = parse_training_tasks("value", tasks, second_task_id)
             check_count = parse_training_tasks("check_count", tasks, second_task_id)
             check_quality = parse_training_tasks("check_quality", tasks, second_task_id)
+            result = parse_training_tasks("result", tasks, second_task_id)
 
             json_check = verifying_responses(check_count, check_quality)
 
             if json_check["status"] == "ACCEPTED":
                 value_list, check_count_list, check_quality_list = [], [], []
-            #     print(
-            #         "Показания счетчика: %s. Тренировочное задание"
-            #         % value
-            #     )
-            #
-            # print("------------------------------------------")
+
+                print(
+                    f"{colorama.Fore.GREEN}ID картинки -> [{first_task_id}] ({json_check['public_comment']}): {colorama.Fore.RESET}Показания счетчика: {value}. "
+                    f"Его подтвердили {counts[ind]} из 5 пользователей")
+
+            if json_check["status"] == "REJECTED":
+                print(
+                    f"{colorama.Fore.RED}ID картинки -> [{first_task_id}] ({json_check['public_comment']})")
+
+        # yt_pool_2.patch_task(first_task_id, json_check)
 
         if json_check["status"] == "ACCEPTED":
-            db.append(
-                {
-                    "first_task_id": first_task_id,
-                    "second_task_id": second_task_id,
-                    "url_img": first_id_to_second_id_map[first_task_id],
-                    "check_count_list": check_count_list,
-                    "check_quality_list": check_quality_list,
-                    "value_list": value_list,
-                    "check_count": check_count,
-                    "check_quality": check_quality,
-                    "values": value,
-                }
-            )
+            for coord in result:
+                db.append(
+                    {
+                        "first_task_id": first_task_id,
+                        "second_task_id": second_task_id,
+                        "url_img": first_task_id,
+                        "result": coord,
+                        "check_count_list": check_count_list,
+                        "check_quality_list": check_quality_list,
+                        "value_list": value_list,
+                        "check_count": check_count,
+                        "check_quality": check_quality,
+                        "values": value,
+                    }
+                )
 
-    # Сохраняем получившийся результат
+    # Сохранить получившийся результат
     pd.DataFrame(db).to_csv("result.csv")
+
+    input()
