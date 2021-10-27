@@ -3,6 +3,8 @@ import json
 import time
 import colorama
 import datetime
+import zipfile
+import urllib.request
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
@@ -238,6 +240,43 @@ def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
                 )
 
     # Сохранить получившийся результат
-    pd.DataFrame(db).to_csv("result.csv")
+    pd.DataFrame(db).to_csv("./tmp/result.csv")
 
     input()
+
+
+def build_dataset(path: str, oc: "OwnCloudAPI") -> None:
+    if not os.path.exists("./datasets"):
+        os.makedirs("./datasets")
+
+    result = pd.read_csv(path)
+
+    urls_images = []
+
+    for produto in result['url_img']:
+        urls_images.append(produto)
+
+    unique_urls_images = list(set(urls_images))
+
+    suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+    os.makedirs(f"./datasets/{suffix}")
+
+    newzip = zipfile.ZipFile(f'./datasets/{suffix}.zip', 'w')
+
+    for i in tqdm(unique_urls_images):
+        resource = urllib.request.urlopen(oc.get_download_url(i))
+        out = open(f"./datasets/{suffix}/{i}.jpg", 'wb')
+        out.write(resource.read())
+        out.close()
+
+        newzip.write(f'./datasets/{suffix}/{i}.jpg')
+
+        os.remove(f"./datasets/{suffix}/{i}.jpg")
+
+
+    pd.DataFrame(result).to_csv(f"./datasets/{suffix}/result.csv")
+    newzip.write(f'./datasets/{suffix}/result.csv')
+    os.remove(f"./datasets/{suffix}/result.csv")
+
+    newzip.close()
+    os.removedirs(f"./datasets/{suffix}")

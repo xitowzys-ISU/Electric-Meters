@@ -166,3 +166,4 @@ cython_debug/
 runBot.sh
 
 result.csv
+datasets/
