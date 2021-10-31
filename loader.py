@@ -48,7 +48,8 @@ def is_training_tasks(tasks: list, task_id: str) -> bool:
             if "known_solutions" in k:
                 return True
             else:
-                return False
+                continue
+    return False
 
 
 def parse_training_tasks(find: str, tasks: list, task_id: str):
@@ -75,22 +76,40 @@ def response_vector(k, second_task_id, second_task) -> list:
     return result
 
 
-def verifying_responses(check_count, check_quality) -> dict:
-    if np.sum(check_count) < 3:
-        json_check = {
-            "status": "REJECTED",
-            "public_comment": "На фотографии должен быть ровно один электрический счетчик с показателями",
-        }
-    elif np.sum(check_quality) < 3:
-        json_check = {
-            "status": "REJECTED",
-            "public_comment": "Показания на счетчике отчетливо не видны",
-        }
+def verifying_responses(check_count, check_quality, is_train: bool) -> dict:
+
+    if not is_train:
+        if np.sum(check_count) < 3:
+            json_check = {
+                "status": "REJECTED",
+                "public_comment": "На фотографии должен быть ровно один электрический счетчик с показателями",
+            }
+        elif np.sum(check_quality) < 3:
+            json_check = {
+                "status": "REJECTED",
+                "public_comment": "Показания на счетчике отчетливо не видны",
+            }
+        else:
+            json_check = {
+                "status": "ACCEPTED",
+                "public_comment": "Изображение счетчика принято",
+            }
     else:
-        json_check = {
-            "status": "ACCEPTED",
-            "public_comment": "Изображение счетчика принято",
-        }
+        if not check_count:
+            json_check = {
+                "status": "REJECTED",
+                "public_comment": "На фотографии должен быть ровно один электрический счетчик с показателями",
+            }
+        elif not check_quality:
+            json_check = {
+                "status": "REJECTED",
+                "public_comment": "Показания на счетчике отчетливо не видны",
+            }
+        else:
+            json_check = {
+                "status": "ACCEPTED",
+                "public_comment": "Изображение счетчика принято",
+            }
 
     return json_check
 
@@ -176,12 +195,15 @@ def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
             check_quality_list = response_vector("check_quality", second_task_id, second_tasks)
             result = response_vector("result", second_task_id, second_tasks)
 
-            json_check = verifying_responses(check_count_list, check_quality_list)
+            json_check = verifying_responses(check_count_list, check_quality_list, is_train=False)
 
             # Найдем для принятых заданий самый частый ответ
             (values, counts) = np.unique(value_list, return_counts=True)
+
             ind = np.argmax(counts)
+
             value = values[ind]
+
             if json_check["status"] == "ACCEPTED":
                 (values, counts) = np.unique(check_count_list, return_counts=True)
                 ind = np.argmax(counts)
@@ -207,7 +229,7 @@ def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
             check_quality = parse_training_tasks("check_quality", tasks, second_task_id)
             result = parse_training_tasks("result", tasks, second_task_id)
 
-            json_check = verifying_responses(check_count, check_quality)
+            json_check = verifying_responses(check_count, check_quality, is_train=True)
 
             if json_check["status"] == "ACCEPTED":
                 value_list, check_count_list, check_quality_list = [], [], []
@@ -220,9 +242,10 @@ def process_second_pool(path: str, yt_pool_2: "YandexToloka") -> None:
                 print(
                     f"{colorama.Fore.RED}ID картинки -> [{first_task_id}] ({json_check['public_comment']})")
 
-        # yt_pool_2.patch_task(first_task_id, json_check)
+        yt_pool_2.patch_task(first_task_id, json_check)
 
         if json_check["status"] == "ACCEPTED":
+
             for coord in result:
                 db.append(
                     {
