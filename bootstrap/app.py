@@ -1,6 +1,7 @@
 from loguru import logger
 
 from config import TELEGRAM_BOT_TOKEN
+from config import localization
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from telegram import Update, ForceReply
@@ -37,12 +38,12 @@ def start_bot(token: str) -> None:
         #                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
         updater.start_polling()
-        logger.success("Бот активирован")
+        logger.success(localization.getText("bot_activate"))
 
         updater.idle()
-        # print("Run bot")
     except telegram.error.Unauthorized:
-        logger.error("Бот неавторизован. Проверьте API ключ")
+        logger.error(localization.getText("bot_unauthorized"))
+        exit(1)
 
 
 def bootstrap() -> None:

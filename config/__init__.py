@@ -1,2 +1,3 @@
 # __version__ = "0.0.1"
-from .config import TELEGRAM_BOT_TOKEN
+from .envs import TELEGRAM_BOT_TOKEN
+from .envs import LOCALIZATION

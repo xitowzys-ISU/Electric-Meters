@@ -5,3 +5,4 @@ env.read_env()
 
 
 TELEGRAM_BOT_TOKEN: str = env.str("TELEGRAM_BOT_TOKEN")
+LOCALIZATION: str = env.str("LOCALIZATION")
