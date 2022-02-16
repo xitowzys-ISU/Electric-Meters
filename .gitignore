@@ -163,3 +163,4 @@ cython_debug/
 
 .vscode
 runBot.sh
+test.py
