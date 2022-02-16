@@ -7,7 +7,7 @@ from config import localization
 from config import TELEGRAM_BOT_TOKEN
 
 
-def test_unauthorized_bot(caplog):
+def test_unauthorized_bot():
 
     token: str = "5112688413:AAHT8bcemHrysm3OjY9QVHp-JcQ0EOr-Js8()"
 
@@ -15,8 +15,6 @@ def test_unauthorized_bot(caplog):
         start_bot(token)
     assert e.type == SystemExit
     assert e.value.code == 1
-
-    # assert "Бот неавторизован. Проверьте API ключ" in caplog.text
 
 
 def test_started_bot():
@@ -31,4 +29,5 @@ def test_started_bot():
             pass
         json_line = json.loads(line)
 
-    assert localization.getText("bot_activate") == json_line['record']['message']
+    assert localization.getText(
+        "bot_activate") == json_line['record']['message']
