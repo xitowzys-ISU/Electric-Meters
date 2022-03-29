@@ -30,4 +30,4 @@ def test_started_bot():
         json_line = json.loads(line)
 
     assert localization.getText(
-        "bot_activate") == json_line['record']['message']
+        "bot_logger_activate") == json_line['record']['message']

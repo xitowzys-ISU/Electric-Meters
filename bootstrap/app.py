@@ -1,7 +1,9 @@
 from loguru import logger
 
-from config import TELEGRAM_BOT_TOKEN
 from config import localization
+from config import TELEGRAM_BOT_TOKEN
+
+from app.handlers import mainHandler
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from telegram import Update, ForceReply
@@ -15,7 +17,9 @@ def logger_configuration() -> None:
     logger.add("./logs/logs.log", format="({time}) {level} {message}",
                level="DEBUG", rotation="10 KB", compression="zip", serialize=True)
 
+
 logger_configuration()
+
 
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
@@ -32,17 +36,18 @@ def start_bot(token: str) -> None:
 
         dispatcher = updater.dispatcher
 
-        dispatcher.add_handler(CommandHandler("start", start))
+        dispatcher.add_handler(CommandHandler(
+            "start", mainHandler.mainHandler))
 
         # logging.basicConfig(level=logging.DEBUG,
         #                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
         updater.start_polling()
-        logger.success(localization.getText("bot_activate"))
+        logger.success(localization.getText("bot_logger_activate"))
 
         updater.idle()
     except telegram.error.Unauthorized:
-        logger.error(localization.getText("bot_unauthorized"))
+        logger.error(localization.getText("bot_logger_unauthorized"))
         exit(1)
 
 
