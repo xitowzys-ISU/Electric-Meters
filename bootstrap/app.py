@@ -1,14 +1,13 @@
+import telegram
+from telegram import Update, ForceReply
+from telegram.ext import Updater, CallbackContext
+
 import sys
 from loguru import logger
 
 from config import localization
 from config import TELEGRAM_BOT_TOKEN
-
-from app.handlers import mainHandler
-
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-from telegram import Update, ForceReply
-import telegram
+from app.handlers import convMainHandler
 
 
 def logger_configuration() -> None:
@@ -42,11 +41,7 @@ def start_bot(token: str) -> None:
 
         dispatcher = updater.dispatcher
 
-        dispatcher.add_handler(CommandHandler(
-            "start", mainHandler.mainHandler))
-
-        # logging.basicConfig(level=logging.DEBUG,
-        #                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        dispatcher.add_handler(convMainHandler)
 
         updater.start_polling()
         logger.success(localization.getText("bot_logger_activate"))
