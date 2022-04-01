@@ -1,9 +1,10 @@
+import sys
 from loguru import logger
 
 from config import localization
 from config import TELEGRAM_BOT_TOKEN
 
-from app.handlers import mainHandler
+from app.handlers import mainHandler, messageHandler, HandlersContainer
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from telegram import Update, ForceReply
@@ -14,8 +15,13 @@ def logger_configuration() -> None:
 
     # TODO: Добавить создание папки logs если её нету
 
-    logger.add("./logs/logs.log", format="({time}) {level} {message}",
-               level="DEBUG", rotation="10 KB", compression="zip", serialize=True)
+    # logger.add("./logs/logs.log", format="({time}) {level} {message}",
+    #            level="DEBUG", rotation="10 KB", compression="zip", serialize=True)
+
+    logger.remove()
+
+    logger.add(
+        sys.stdout, colorize=True, format="(<level>{level}</level>) [<green>{time:HH:mm:ss}</green>] ➤ <yellow>{message}</yellow>")
 
 
 logger_configuration()
@@ -23,6 +29,7 @@ logger_configuration()
 
 def start(update: Update, context: CallbackContext) -> None:
     """Send a message when the command /start is issued."""
+
     user = update.effective_user
     update.message.reply_markdown_v2(
         fr'Hi {user.mention_markdown_v2()}\!',
@@ -36,8 +43,18 @@ def start_bot(token: str) -> None:
 
         dispatcher = updater.dispatcher
 
-        dispatcher.add_handler(CommandHandler(
-            "start", mainHandler.mainHandler))
+        handlersContainer = HandlersContainer(dispatcher)
+        handlersContainer2 = HandlersContainer()
+        print(handlersContainer)
+        # handlersContainer2 = HandlersContainer()
+        handlersContainer.addHandler(CommandHandler(
+            "start", mainHandler), "mainHandler")
+
+        # dispatcher.add_handler(CommandHandler(
+        #     "start", mainHandler))
+
+        handlersContainer.addHandler(MessageHandler(
+            Filters.text & (~Filters.command), messageHandler), "messageHandler")
 
         # logging.basicConfig(level=logging.DEBUG,
         #                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
