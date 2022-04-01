@@ -2,7 +2,7 @@ from config import localization
 from telegram import Update
 from telegram.ext import CallbackContext
 
-from app.keyboards import mainKeyboard
+from app.telegramBot.keyboards import mainKeyboard
 from . import ConversationHandlers, TolokoSettingsHandler
 
 

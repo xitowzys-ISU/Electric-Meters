@@ -2,7 +2,7 @@ from telegram.ext import CommandHandler, MessageHandler, Filters, ConversationHa
 
 from loguru import logger as log
 
-from app.handlers import TolokoSettingsHandler, mainHandler
+from app.telegramBot.handlers import TolokoSettingsHandler, mainHandler
 
 
 SELECT_MENU = chr(0)

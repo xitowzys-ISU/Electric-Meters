@@ -5,8 +5,8 @@ from telegram.ext import CallbackContext
 from loguru import logger as log
 
 from config import localization
-from app.handlers import mainHandler
-from app.keyboards import TolokoSettingsKeyboards
+from app.telegramBot.handlers import mainHandler
+from app.telegramBot.keyboards import TolokoSettingsKeyboards
 
 
 def messageHandler(update: Update, context: CallbackContext):

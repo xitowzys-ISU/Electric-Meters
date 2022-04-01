@@ -7,7 +7,7 @@ from loguru import logger
 
 from config import localization
 from config import TELEGRAM_BOT_TOKEN
-from app.handlers import convMainHandler
+from app.telegramBot.handlers import convMainHandler
 
 
 def logger_configuration() -> None:
