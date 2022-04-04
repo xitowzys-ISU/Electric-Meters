@@ -15,14 +15,14 @@ def messageHandler(update: Update, context: CallbackContext):
     if (localization.getText("bot_back_button") == text):
         log.debug("back_button")
         mainHandler.mainHandler(update, context)
-        return chr(0)
+        return "SHOW_MAIN_KEYBOARD"
 
 
 def TolokoSettingsHandler(update: Update, context: CallbackContext):
     log.debug("Активирован найстройки Toloko")
 
     update.message.reply_text(
-        text=localization.getText("bot_handler_main_text"),
+        text=localization.getText("bot_handler_tokolo_settings_welcome_text"),
         reply_markup=TolokoSettingsKeyboards.defaultMenuButton
     )
 

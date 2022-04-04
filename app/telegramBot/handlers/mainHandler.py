@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import CallbackContext
 
 from app.telegramBot.keyboards import mainKeyboard
-from . import ConversationHandlers, TolokoSettingsHandler
+from . import TolokoSettingsHandler
 
 
 def messageHandler(update: Update, context: CallbackContext):
@@ -19,4 +19,4 @@ def mainHandler(update: Update, context: CallbackContext):
         text=localization.getText("bot_handler_main_text"),
         reply_markup=mainKeyboard.defaultMenuButton
     )
-    return ConversationHandlers.SELECT_MENU
+    return "SHOW_MAIN_KEYBOARD"

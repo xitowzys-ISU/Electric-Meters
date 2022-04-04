@@ -4,8 +4,18 @@ from loguru import logger as log
 
 from app.telegramBot.handlers import TolokoSettingsHandler, mainHandler
 
+convProjectSettingsHandler = ConversationHandler(
+    entry_points=[MessageHandler(
+        filters=Filters.text, callback=TolokoSettingsHandler.messageHandler)],
 
-SELECT_MENU = chr(0)
+    states={
+    },
+
+    fallbacks=[],
+    map_to_parent={
+        "SHOW_MAIN_KEYBOARD": "SHOW_MAIN_KEYBOARD"
+    }
+)
 
 convTolokoSettingsHandler = ConversationHandler(
     entry_points=[MessageHandler(
@@ -16,7 +26,7 @@ convTolokoSettingsHandler = ConversationHandler(
 
     fallbacks=[],
     map_to_parent={
-        SELECT_MENU: SELECT_MENU
+        "SHOW_MAIN_KEYBOARD": "SHOW_MAIN_KEYBOARD"
     }
 )
 
@@ -27,7 +37,7 @@ convMainHandler = ConversationHandler(
 
     states={
         "NAME_PRODUCT": [convTolokoSettingsHandler],
-        SELECT_MENU: [MessageHandler(
+        "SHOW_MAIN_KEYBOARD": [MessageHandler(
             filters=Filters.text, callback=mainHandler.messageHandler)],
     },
 
