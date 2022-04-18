@@ -1,1 +1,1 @@
-from .ConversationHandlers import convMainHandler
+from .dispatchers import ConversationHandlers
