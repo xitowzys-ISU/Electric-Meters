@@ -1,12 +1,15 @@
 from telegram.ext import CommandHandler, MessageHandler, Filters, ConversationHandler
 
-from loguru import logger as log
+from app.telegramBot.utils import HandlersContainer
 
-from app.telegramBot.handlers import TolokoSettingsHandler, mainHandler, ProjectSettingsHandler
+
+handlerContainer = HandlersContainer()
+
+# print(handlerContainer["ProjectSettingsHandler"]["messageHandler"])
 
 convProjectSettingsHandler = ConversationHandler(
     entry_points=[MessageHandler(
-        filters=Filters.text, callback=ProjectSettingsHandler.messageHandler)],
+        filters=Filters.text, callback=handlerContainer["ProjectSettingsHandler"]["messageHandler"])],
 
     states={
     },
@@ -20,12 +23,12 @@ convProjectSettingsHandler = ConversationHandler(
 
 convTolokoSettingsHandler = ConversationHandler(
     entry_points=[MessageHandler(
-        filters=Filters.text, callback=TolokoSettingsHandler.messageHandler)],
+        filters=Filters.text, callback=handlerContainer["TolokoSettingsHandler"]["messageHandler"])],
 
     states={
         "PROJECT_SETTINGS": [convProjectSettingsHandler],
         "SHOW_TOLOKO_SETTINGS_KEYBOARD": [MessageHandler(
-            filters=Filters.text, callback=TolokoSettingsHandler.messageHandler)]
+            filters=Filters.text, callback=handlerContainer["TolokoSettingsHandler"]["messageHandler"])]
     },
 
     fallbacks=[],
@@ -38,12 +41,12 @@ convTolokoSettingsHandler = ConversationHandler(
 convMainHandler = ConversationHandler(
     entry_points=[
         CommandHandler(
-            "start", mainHandler.mainHandler)],
+            "start", handlerContainer["mainHandler"]["mainHandler"])],
 
     states={
         "NAME_PRODUCT": [convTolokoSettingsHandler],
         "SHOW_MAIN_KEYBOARD": [MessageHandler(
-            filters=Filters.text, callback=mainHandler.messageHandler)],
+            filters=Filters.text, callback=handlerContainer["mainHandler"]["messageHandler"])],
     },
 
     fallbacks=[],

@@ -1,13 +1,11 @@
 import telegram
-from telegram import Update, ForceReply
-from telegram.ext import Updater, CallbackContext
+from telegram.ext import Updater
 
 import sys
 from loguru import logger
+from app.telegramBot.utils import HandlersContainer
 
-from config import localization
-from config import TELEGRAM_BOT_TOKEN
-from app.telegramBot.handlers.dispatchers.ConversationHandlers import convMainHandler
+from config import localization, TELEGRAM_BOT_TOKEN
 
 
 def logger_configuration() -> None:
@@ -36,10 +34,14 @@ def start(update: Update, context: CallbackContext) -> None:
 
 
 def start_bot(token: str) -> None:
+
     try:
+
         updater = Updater(token)
 
         dispatcher = updater.dispatcher
+
+        from app.telegramBot.handlers.dispatchers.ConversationHandlers import convMainHandler
 
         dispatcher.add_handler(convMainHandler)
 
@@ -56,5 +58,8 @@ def bootstrap() -> None:
     """Launching the application
 
     """
+    logger_configuration()
+
+    handlerContainer = HandlersContainer("app/telegramBot/handlers")
 
     start_bot(TELEGRAM_BOT_TOKEN)

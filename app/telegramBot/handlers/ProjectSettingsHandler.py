@@ -1,3 +1,4 @@
+from app.telegramBot.utils import HandlersContainer
 from config import localization
 from telegram import Update
 from telegram.ext import CallbackContext
@@ -5,7 +6,8 @@ from telegram.ext import CallbackContext
 from loguru import logger as log
 
 from app.telegramBot.keyboards import ProjectSettingsKeyboards
-from . import mainHandler, TolokoSettingsHandler
+
+handlerContainer = HandlersContainer()
 
 
 def messageHandler(update: Update, context: CallbackContext):
@@ -14,10 +16,11 @@ def messageHandler(update: Update, context: CallbackContext):
 
     if (localization.getText("bot_back_button") == text):
         log.debug("back_button")
-        TolokoSettingsHandler.TolokoSettingsHandler(update, context)
+        handlerContainer["TolokoSettingsHandler"]["TolokoSettingsHandler"](
+            update, context)
         return "BACK"
     elif (localization.getText("bot_main_back_button") == text):
-        mainHandler.mainHandler(update, context)
+        handlerContainer["mainHandler"]["mainHandler"](update, context)
         return "BACK_MENU"
 
 
