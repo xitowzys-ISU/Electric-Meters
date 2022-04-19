@@ -2,10 +2,7 @@ from telegram.ext import CommandHandler, MessageHandler, Filters, ConversationHa
 
 from app.telegramBot.utils import HandlersContainer
 
-
 handlerContainer = HandlersContainer()
-
-# print(handlerContainer["ProjectSettingsHandler"]["messageHandler"])
 
 convProjectSettingsHandler = ConversationHandler(
     entry_points=[MessageHandler(

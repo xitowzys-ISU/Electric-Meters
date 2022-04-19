@@ -23,13 +23,13 @@ def logger_configuration() -> None:
 
 def start_bot(token: str) -> None:
 
+    from app.telegramBot.handlers.dispatchers.ConversationHandlers import convMainHandler
+
     try:
 
         updater = Updater(token)
 
         dispatcher = updater.dispatcher
-
-        from app.telegramBot.handlers.dispatchers.ConversationHandlers import convMainHandler
 
         dispatcher.add_handler(convMainHandler)
 
