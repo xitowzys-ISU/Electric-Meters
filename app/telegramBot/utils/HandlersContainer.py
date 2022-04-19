@@ -5,6 +5,19 @@ from loguru import logger as log
 
 
 class HandlersContainer():
+    """
+    A class used to automatically create a handler container for ease of use in any file
+
+    Attributes
+    ----------
+    path_handlers : str
+        Path to the handlers folder
+
+    Methods
+    -------
+    get_all_handlers()
+        List of all handlers found
+    """
 
     __instance = None
 
