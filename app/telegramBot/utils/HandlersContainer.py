@@ -21,15 +21,14 @@ class HandlersContainer():
 
     __instance = None
 
-    def __new__(cls, path_handlers: str = None, *args, **kwargs):
+    def __new__(cls, path_handlers: str = None):
         if cls.__instance is None:
-            cls.__instance = super(
-                HandlersContainer, cls).__new__(cls, *args, **kwargs)
+            cls.__instance = super(HandlersContainer, cls).__new__(cls)
             cls.__instance.__initialized = False
+
         return cls.__instance
 
-    def __init__(self, path_handlers: str = None, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, path_handlers: str = None) -> None:
 
         if not self.__initialized:
             log.info("Создан контейнер обработчиков")
