@@ -19,6 +19,12 @@ def messageHandler(update: Update, context: CallbackContext):
         handlerContainer["TolokoSettingsHandler"]["TolokoSettingsHandler"](
             update, context)
         return "BACK"
+
+    elif (localization.getText("bot_keyboard_project_settings_create_project") == text):
+        handlerContainer["CreateProjectHandler"]["CreateProjectHandler"](
+            update, context)
+        return "CREATE_PROJECT"
+
     elif (localization.getText("bot_main_back_button") == text):
         handlerContainer["mainHandler"]["mainHandler"](update, context)
         return "BACK_MENU"
