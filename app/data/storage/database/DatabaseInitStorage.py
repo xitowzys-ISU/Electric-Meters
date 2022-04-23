@@ -3,8 +3,8 @@ import sqlalchemy as sa
 from sqlalchemy import inspect
 from loguru import logger as log
 from app.data.storage.IInitDBStorage import IInitDBStorage
-from config import DB_USERNAME, DB_DATABASE, DB_HOST, DB_PASSWORD, DB_PORT
 from app.data.storage.database.SQLAlchemy.declarative_base import Base
+from app.data.storage.database.SQLAlchemy.engine import engine
 
 
 class DatabaseInitStorage(IInitDBStorage):
@@ -28,9 +28,6 @@ class DatabaseInitStorage(IInitDBStorage):
         import app.data.storage.database.models.TestTable
 
     def init(self) -> bool:
-        engine = sa.create_engine(
-            f"mariadb+mariadbconnector://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_DATABASE}")
-
         self.__import_tables()
 
         log.info(f"Проверка таблиц")
