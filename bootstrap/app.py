@@ -3,7 +3,12 @@ from telegram.ext import Updater
 
 import sys
 from loguru import logger
+from app.data.repository.IInitDBRepositoryImpl import IInitDBRepositoryImpl
+from app.data.storage.database.DatabaseInitStorage import DatabaseInitStorage
+from app.domain.repository.IInitDBRepository import IInitDBRepository
+from app.domain.usecase.InitDBTablesUsecase import InitDBTableUsecase
 from app.telegramBot.utils import HandlersContainer
+import app.domain.usecase as dUsecase
 
 from config import localization, TELEGRAM_BOT_TOKEN
 
@@ -19,6 +24,16 @@ def logger_configuration() -> None:
 
     logger.add(
         sys.stdout, colorize=True, format="(<level>{level}</level>) [<green>{time:HH:mm:ss}</green>] ➤ <level>{message}</level>")
+
+
+def init_database() -> None:
+    project_id_repository: IInitDBRepository = IInitDBRepositoryImpl(
+        DatabaseInitStorage())
+
+    init_database: InitDBTableUsecase = dUsecase.InitDBTableUsecase(
+        project_id_repository)
+
+    init_database.execute()
 
 
 def start_bot(token: str) -> None:
@@ -47,6 +62,8 @@ def bootstrap() -> None:
 
     """
     logger_configuration()
+
+    init_database()
 
     handlerContainer = HandlersContainer("app/telegramBot/handlers")
 

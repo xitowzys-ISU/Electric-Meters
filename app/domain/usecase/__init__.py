@@ -1,1 +1,2 @@
 from .SaveProjectIdUsecase import SaveProjectIdUsecase
+from .InitDBTablesUsecase import InitDBTableUsecase
