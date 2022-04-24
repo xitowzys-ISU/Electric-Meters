@@ -29,6 +29,7 @@ class DatabaseProjectIdStorage(IProjectIdStorage):
     def save(self, project_id: ProjectId) -> bool:
 
         from app.data.storage.database.models.TolokoSettings import TolokoSettings
+        from app.data.storage.database.models.ProjectsId import ProjectsId
 
         Session = sa.orm.sessionmaker()
         Session.configure(bind=engine)
@@ -37,14 +38,17 @@ class DatabaseProjectIdStorage(IProjectIdStorage):
         try:
             toloko_settings = session.query(TolokoSettings).one()
 
-            toloko_settings.project_id = project_id.id
+            toloko_settings.projects_id.project_id = project_id.id
 
             session.commit()
 
             log.success(f"Изменен ID проекта: {project_id.id}")
         except NoResultFound as e:
-            new_toloko_settings = TolokoSettings(project_id=project_id.id)
-            session.add(new_toloko_settings)
+            db_project_id = ProjectsId(project_id=project_id.id)
+
+            new_toloko_settings = TolokoSettings(projects_id=db_project_id)
+
+            session.add_all([db_project_id, new_toloko_settings])
             session.commit()
 
             log.success(f"Добавлен новый ID проекта: {project_id.id}")
