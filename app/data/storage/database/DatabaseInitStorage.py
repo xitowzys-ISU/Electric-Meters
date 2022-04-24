@@ -25,7 +25,6 @@ class DatabaseInitStorage(IInitDBStorage):
 
     def __import_tables(self) -> None:
         import app.data.storage.database.models.TolokoSettings
-        import app.data.storage.database.models.TestTable
 
     def init(self) -> bool:
         self.__import_tables()

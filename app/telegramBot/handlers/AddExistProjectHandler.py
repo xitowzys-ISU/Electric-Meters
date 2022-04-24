@@ -1,11 +1,10 @@
-from ast import Add
 from telegram import Update
 from telegram.ext import CallbackContext
 
 from loguru import logger as log
 from app.data.repository import ProjectIdRepositoryImpl
 from app.data.storage.database.DatabaseProjectIdStorage import DatabaseProjectIdStorage
-from app.domain.models.ProjectId import ProjectId
+from app.domain.models.ProjectUrl import ProjectUrl
 from app.domain.repository.IProjectIdRepository import IProjectIdRepository
 from app.domain.usecase.SaveProjectIdUsecase import SaveProjectIdUsecase
 from app.telegramBot.utils import HandlersContainer
@@ -28,7 +27,7 @@ def messageHandler(update: Update, context: CallbackContext):
             update, context)
         return "BACK"
     else:
-        url: ProjectId = dModels.ProjectId(id="66432")
+        url: ProjectUrl = dModels.ProjectUrl(url=text)
 
         project_id_repository: IProjectIdRepository = ProjectIdRepositoryImpl(
             DatabaseProjectIdStorage())
@@ -36,8 +35,10 @@ def messageHandler(update: Update, context: CallbackContext):
         save_project_id: SaveProjectIdUsecase = dUsecase.SaveProjectIdUsecase(
             project_id_repository)
 
-        save_project_id.execute(url)
-        pass
+        if save_project_id.execute(url):
+            update.message.reply_text(text="ID проекта изменен")
+        else:
+            update.message.reply_text(text="Неккоректный url")
 
 
 def AddExistProjectHandler(update: Update, context: CallbackContext):
