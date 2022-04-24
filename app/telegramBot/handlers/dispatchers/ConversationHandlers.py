@@ -4,6 +4,18 @@ from app.telegramBot.utils import HandlersContainer
 
 handlerContainer = HandlersContainer()
 
+convAddExistPoolHandler = ConversationHandler(
+    entry_points=[MessageHandler(
+        filters=Filters.text, callback=handlerContainer["AddExistPoolHandler"]["messageHandler"])],
+
+    states={
+    },
+
+    fallbacks=[],
+    map_to_parent={
+        "BACK": "SHOW_CREATE_POOLS_KEYBOARD"
+    }
+)
 
 convAddExistProjectHandler = ConversationHandler(
     entry_points=[MessageHandler(
@@ -35,6 +47,40 @@ convCreateProjectHandler = ConversationHandler(
     }
 )
 
+convCreatePoolsHandler = ConversationHandler(
+    entry_points=[MessageHandler(
+        filters=Filters.text, callback=handlerContainer["CreatePoolsHandler"]["messageHandler"])],
+
+    states={
+        "SHOW_CREATE_POOLS_KEYBOARD": [MessageHandler(
+            filters=Filters.text, callback=handlerContainer["CreatePoolsHandler"]["messageHandler"])],
+        "ADD_EXIST_POOLS": [convAddExistPoolHandler]
+    },
+
+    fallbacks=[],
+    map_to_parent={
+        "BACK": "SHOW_POOLS_SETTINGS_KEYBOARD",
+        "BACK_MENU": "BACK_MENU"
+    }
+)
+
+convPoolsSettingsHandler = ConversationHandler(
+    entry_points=[MessageHandler(
+        filters=Filters.text, callback=handlerContainer["PoolsSettingsHandler"]["messageHandler"])],
+
+    states={
+        "SHOW_POOLS_SETTINGS_KEYBOARD": [MessageHandler(
+            filters=Filters.text, callback=handlerContainer["PoolsSettingsHandler"]["messageHandler"])],
+        "CREATE_POOLS": [convCreatePoolsHandler]
+    },
+
+    fallbacks=[],
+    map_to_parent={
+        "BACK": "SHOW_TOLOKO_SETTINGS_KEYBOARD",
+        "BACK_MENU": "BACK_MENU"
+    }
+)
+
 convProjectSettingsHandler = ConversationHandler(
     entry_points=[MessageHandler(
         filters=Filters.text, callback=handlerContainer["ProjectSettingsHandler"]["messageHandler"])],
@@ -58,6 +104,7 @@ convTolokoSettingsHandler = ConversationHandler(
 
     states={
         "PROJECT_SETTINGS": [convProjectSettingsHandler],
+        "POOLS_SETTINGS": [convPoolsSettingsHandler],
         "SHOW_TOLOKO_SETTINGS_KEYBOARD": [MessageHandler(
             filters=Filters.text, callback=handlerContainer["TolokoSettingsHandler"]["messageHandler"])]
     },

@@ -20,7 +20,15 @@ def messageHandler(update: Update, context: CallbackContext):
 
     elif (localization.getText("bot_keyboard_toloko_settings_project_setup") == text):
         log.debug("Проект")
-        return handlerContainer["ProjectSettingsHandler"]["ProjectSettingsHandler"](update, context)
+        handlerContainer["ProjectSettingsHandler"]["ProjectSettingsHandler"](
+            update, context)
+        return "PROJECT_SETTINGS"
+
+    elif (localization.getText("bot_keyboard_toloko_settings_pool_setup") == text):
+        log.debug("Пул")
+        handlerContainer["PoolsSettingsHandler"]["PoolsSettingsHandler"](
+            update, context)
+        return "POOLS_SETTINGS"
 
     elif (localization.getText("bot_main_back_button") == text):
         handlerContainer["mainHandler"]["mainHandler"](update, context)
